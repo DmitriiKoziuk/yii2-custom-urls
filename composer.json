@@ -1,0 +1,31 @@
+{
+    "name": "dmitriikoziuk/yii2-custom-urls",
+    "description": "Url index yii2 extension",
+    "type": "yii2-extension",
+    "keywords": [
+        "yii2",
+        "extension",
+        "url index",
+        "custom url"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dmitrii Koziuk",
+            "email": "dmitriikoziuk@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.0",
+        "yiisoft/yii2": "~2.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "DmitriiKoziuk\\yii2CustomUrls\\": "src"
+        }
+    },
+    "extra": {
+        "bootstrap": "DmitriiKoziuk\\yii2CustomUrls\\Bootstrap"
+    }
+}
