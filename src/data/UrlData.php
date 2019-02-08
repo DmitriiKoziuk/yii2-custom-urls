@@ -20,6 +20,7 @@ class UrlData extends Data
             [['url', 'module_name', 'controller_name', 'action_name', 'entity_id'], 'required'],
             [['url', 'redirect_to_url'], 'string', 'max' => 500],
             [['module_name', 'controller_name', 'action_name', 'entity_id'], 'string', 'max' => 45],
+            [['created_at', 'updated_at'], 'integer'],
         ];
     }
 

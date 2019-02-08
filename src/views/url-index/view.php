@@ -39,8 +39,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'controller_name',
             'action_name',
             'entity_id',
-            'created_at',
-            'updated_at',
+            'created_at:datetime',
+            'updated_at:datetime',
         ],
     ]) ?>
 
