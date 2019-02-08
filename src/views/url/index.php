@@ -2,15 +2,15 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
-use DmitriiKoziuk\yii2CustomUrls\CustomUrls;
+use DmitriiKoziuk\yii2CustomUrls\CustomUrlsModule;
 
 /**
  * @var $this         yii\web\View
- * @var $searchModel  \DmitriiKoziuk\yii2CustomUrls\data\UrlIndexSearchParams
+ * @var $searchModel  \DmitriiKoziuk\yii2CustomUrls\forms\UrlSearchForm
  * @var $dataProvider yii\data\ActiveDataProvider
  */
 
-$this->title = Yii::t(CustomUrls::ID, 'Url index');
+$this->title = Yii::t(CustomUrlsModule::ID, 'Url index');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="url-index-index">
@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a(Yii::t(CustomUrls::ID, 'Add url to index'), ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t(CustomUrlsModule::ID, 'Add url to index'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([

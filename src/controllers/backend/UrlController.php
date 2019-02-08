@@ -7,24 +7,25 @@ use yii\base\Module;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use DmitriiKoziuk\yii2CustomUrls\data\UrlIndexSearchParams;
+use DmitriiKoziuk\yii2CustomUrls\forms\UrlSearchForm;
 use DmitriiKoziuk\yii2CustomUrls\data\UrlData;
-use DmitriiKoziuk\yii2CustomUrls\services\UrlIndexSearchService;
-use DmitriiKoziuk\yii2CustomUrls\services\UrlService;
 use DmitriiKoziuk\yii2CustomUrls\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2CustomUrls\forms\UrlUpdateForm;
+use DmitriiKoziuk\yii2CustomUrls\forms\UrlDeleteForm;
+use DmitriiKoziuk\yii2CustomUrls\services\UrlSearchService;
+use DmitriiKoziuk\yii2CustomUrls\services\UrlIndexService;
 
 /**
  * UrlController implements the CRUD actions for UrlIndex model.
  */
-class UrlIndexController extends Controller
+class UrlController extends Controller
 {
     protected $_urlIndexService;
 
     public function __construct(
         string $id,
         Module $module,
-        UrlService $urlIndexService,
+        UrlIndexService $urlIndexService,
         array $config = []
     ) {
         parent::__construct($id, $module, $config);
@@ -52,13 +53,13 @@ class UrlIndexController extends Controller
      */
     public function actionIndex()
     {
-        $searchParams = new UrlIndexSearchParams();
-        $searchParams->load(Yii::$app->request->queryParams);
-        $searchService = new UrlIndexSearchService($searchParams);
+        $searchForm = new UrlSearchForm();
+        $searchForm->load(Yii::$app->request->queryParams);
+        $searchService = new UrlSearchService($searchForm);
         $dataProvider = $searchService->getActiveDataProvider();
 
         return $this->render('index', [
-            'searchModel' => $searchParams,
+            'searchModel' => $searchForm,
             'dataProvider' => $dataProvider,
         ]);
     }
@@ -71,9 +72,9 @@ class UrlIndexController extends Controller
      */
     public function actionView($id)
     {
-        $urlIndexData = $this->_findData($id);
+        $urlData = $this->_findData($id);
         return $this->render('view', [
-            'model' => $urlIndexData,
+            'urlData' => $urlData,
         ]);
     }
 
@@ -86,23 +87,19 @@ class UrlIndexController extends Controller
     public function actionCreate()
     {
         $urlCreateForm = new UrlCreateForm();
-
         if (
             Yii::$app->request->isPost &&
-            $urlCreateForm->load(Yii::$app->request->post()) &&
-            $urlCreateForm->validate()
+            $urlCreateForm->load(Yii::$app->request->post())
         ) {
-            $urlData = $this->_urlIndexService->addUrlToIndex($urlCreateForm);
-
-            if ($urlData->hasErrors()) {
-                Yii::$app->session->setFlash('error', $urlData->getErrorsAsString());
+            $urlCreateForm = $this->_urlIndexService->addUrlToIndex($urlCreateForm);
+            if ($urlCreateForm->hasErrors()) {
+                Yii::$app->session->setFlash('error', $urlCreateForm->getErrorsAsString());
             } else {
-                return $this->redirect(['index', 'id' => $urlData->url]);
+                return $this->redirect(['index', 'id' => $urlCreateForm->url]);
             }
         }
-
         return $this->render('create', [
-            'urlIndexInputData' => $urlCreateForm,
+            'urlCreateForm' => $urlCreateForm,
         ]);
     }
 
@@ -111,7 +108,6 @@ class UrlIndexController extends Controller
      * @return string
      * @throws NotFoundHttpException
      * @throws \DmitriiKoziuk\yii2Base\exceptions\DataNotValidException
-     * @throws \DmitriiKoziuk\yii2Base\exceptions\EntityNotFoundException
      * @throws \DmitriiKoziuk\yii2Base\exceptions\EntitySaveException
      */
     public function actionUpdate($id)
@@ -119,18 +115,17 @@ class UrlIndexController extends Controller
         $urlUpdateForm = new UrlUpdateForm();
         if (
             Yii::$app->request->isPost &&
-            $urlUpdateForm->load(Yii::$app->request->post()) &&
-            $urlUpdateForm->validate()
+            $urlUpdateForm->load(Yii::$app->request->post())
         ) {
-            $urlData = $this->_urlIndexService->updateUrlInIndex($urlUpdateForm);
-
-            if ($urlData->hasErrors()) {
-                Yii::$app->session->setFlash('error', $urlData->getErrorsAsString());
+            $urlUpdateForm = $this->_urlIndexService->updateUrlInIndex($urlUpdateForm);
+            if ($urlUpdateForm->hasErrors()) {
+                Yii::$app->session->setFlash('error', $urlUpdateForm->getErrorsAsString());
             }
+        } else {
+            $urlUpdateForm = $this->_findData($id)->getUpdateForm();
         }
-
         return $this->render('update', [
-            'urlIndexInputData' => $urlData,
+            'urlUpdateForm' => $urlUpdateForm,
         ]);
     }
 
@@ -141,18 +136,14 @@ class UrlIndexController extends Controller
      */
     public function actionDelete($id)
     {
-        $urlData = new UrlData();
-        $urlData->url = $id;
-
-        if ($urlData->validate()) {
-            $urlData = $this->_urlIndexService
-                ->deleteUrlFromIndex($urlData);
+        $urlDeleteForm = new UrlDeleteForm([
+            'url' => $id,
+        ]);
+        $urlDeleteForm = $this->_urlIndexService
+            ->deleteUrlFromIndex($urlDeleteForm);
+        if ($urlDeleteForm->hasErrors()) {
+            Yii::$app->session->setFlash('error', $urlDeleteForm->getErrorsAsString());
         }
-
-        if ($urlData->hasErrors()) {
-            Yii::$app->session->setFlash('error', $urlData->getErrorsAsString());
-        }
-
         return $this->redirect(['index']);
     }
 

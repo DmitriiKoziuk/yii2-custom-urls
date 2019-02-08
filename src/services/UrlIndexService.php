@@ -11,6 +11,7 @@ use DmitriiKoziuk\yii2Base\exceptions\EntityNotValidException;
 use DmitriiKoziuk\yii2CustomUrls\records\UrlIndexRecord;
 use DmitriiKoziuk\yii2CustomUrls\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2CustomUrls\forms\UrlUpdateForm;
+use DmitriiKoziuk\yii2CustomUrls\forms\UrlDeleteForm;
 use DmitriiKoziuk\yii2CustomUrls\data\UrlData;
 use DmitriiKoziuk\yii2CustomUrls\repositories\UrlIndexRepository;
 
@@ -18,7 +19,7 @@ use DmitriiKoziuk\yii2CustomUrls\repositories\UrlIndexRepository;
  * Class UrlService
  * @package DmitriiKoziuk\yii2CustomUrls\services
  */
-final class UrlService extends EntityActionService
+final class UrlIndexService extends EntityActionService
 {
     private $_urlIndexRepository;
 
@@ -32,80 +33,68 @@ final class UrlService extends EntityActionService
 
     /**
      * @param UrlCreateForm $createForm
-     * @return UrlData
+     * @return UrlCreateForm
      * @throws DataNotValidException
      * @throws EntityNotValidException
      * @throws EntitySaveException
      */
-    public function addUrlToIndex(UrlCreateForm $createForm): UrlData
+    public function addUrlToIndex(UrlCreateForm $createForm): UrlCreateForm
     {
-        if (! $createForm->validate()) {
-            $e = new DataNotValidException('Data for creation url not valid');
-            $e->addErrors($createForm->getErrors());
-            throw $e;
+        if ($createForm->validate()) {
+            $urlIndexRecord = new UrlIndexRecord();
+            $urlIndexRecord->setAttributes($createForm->getAttributes());
+            $this->_urlIndexRepository->save($urlIndexRecord);
         }
-        $urlIndex = new UrlIndexRecord();
-        $urlIndex->setAttributes($createForm->getAttributes());
-        $this->_urlIndexRepository->save($urlIndex);
-        $urlData = new UrlData();
-        $urlData->setAttributes($urlIndex->getAttributes());
-        return $urlData;
+        return $createForm;
     }
 
     /**
-     * @param UrlUpdateForm $inputData
-     * @return UrlData
+     * @param UrlUpdateForm $urlUpdateForm
+     * @return UrlUpdateForm
      * @throws DataNotValidException
-     * @throws EntityNotFoundException
      * @throws EntitySaveException
      */
-    public function updateUrlInIndex(UrlUpdateForm $inputData): UrlData
+    public function updateUrlInIndex(UrlUpdateForm $urlUpdateForm): UrlUpdateForm
     {
-        if (! $inputData->validate()) {
-            $e = new DataNotValidException('Data for update url not valid');
-            $e->addErrors($inputData->getErrors());
-            throw $e;
+        if ($urlUpdateForm->validate()) {
+            $urlIndexRecord = $this->_urlIndexRepository->findEntity(
+                $urlUpdateForm->controller_name,
+                $urlUpdateForm->action_name,
+                $urlUpdateForm->entity_id,
+                $urlUpdateForm->module_name
+            );
+            if (empty($urlIndexRecord)) {
+                $urlUpdateForm->addError('entity', 'Url for update not found.');
+            }
+            $this->_updateUrlIndex($urlIndexRecord, $urlUpdateForm->url);
         }
-        $urlIndexEntity = $this->_urlIndexRepository->findEntity(
-            $inputData->controller_name,
-            $inputData->action_name,
-            $inputData->entity_id,
-            $inputData->module_name
-        );
-        if (empty($urlIndexEntity)) {
-            throw new EntityNotFoundException('Entity not found.');
-        }
-        $urlIndexEntity = $this->_updateUrlIndex($urlIndexEntity, $inputData->url);
-        $urlData = new UrlData();
-        $urlData->setAttributes($urlIndexEntity->getAttributes());
-        return $urlData;
+        return $urlUpdateForm;
     }
 
     /**
-     * @param string $url
-     * @return UrlData
+     * @param UrlDeleteForm $urlDeleteForm
+     * @return UrlDeleteForm
      * @throws \Throwable
      * @throws \yii\db\Exception
      * @throws \yii\db\StaleObjectException
      */
-    public function deleteUrlFromIndex(string $url): UrlData
+    public function deleteUrlFromIndex(UrlDeleteForm $urlDeleteForm): UrlDeleteForm
     {
         $this->beginTransaction();
-        $inputData = new UrlData(['url' => $url]);
         try {
-            $urlIndexRecord = $this->_urlIndexRepository->findByUrl($url);
+            $urlIndexRecord = $this->_urlIndexRepository->findByUrl($urlDeleteForm->url);
             if (empty($urlIndexRecord)) {
                 throw new EntityNotFoundException('Record not found');
             }
             $this->_deleteUrlIndex($urlIndexRecord);
             $this->commitTransaction();
         } catch (EntityNotFoundException $e) {
-            $inputData->addError('Record not found', $e->getMessage());
+            $urlDeleteForm->addError('Record not found', $e->getMessage());
         } catch (EntityDeleteException $e) {
-            $inputData->addErrors($e->getErrors());
+            $urlDeleteForm->addErrors($e->getErrors());
         }
         $this->rollbackTransaction();
-        return $inputData;
+        return $urlDeleteForm;
     }
 
     /**
@@ -118,9 +107,7 @@ final class UrlService extends EntityActionService
         if (empty($urlIndexRecord)) {
             return null;
         } else {
-            $urlData = new UrlData();
-            $urlData->setAttributes($urlIndexRecord->getAttributes());
-            return $urlData;
+            return new UrlData($urlIndexRecord);
         }
     }
 

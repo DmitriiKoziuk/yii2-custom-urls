@@ -18,8 +18,8 @@ final class Bootstrap implements BootstrapInterface
     {
         /** @var ConfigService $configService */
         $configService = Yii::$container->get(ConfigService::class);
-        $app->setModule(CustomUrls::ID, [
-            'class' => CustomUrls::class,
+        $app->setModule(CustomUrlsModule::ID, [
+            'class' => CustomUrlsModule::class,
             'diContainer' => Yii::$container,
             'backendAppId' => $configService->getValue(
                 ConfigModule::GENERAL_CONFIG_NAME,
@@ -30,8 +30,8 @@ final class Bootstrap implements BootstrapInterface
                 'frontendAppId'
             ),
         ]);
-        /** @var CustomUrls $module */
-        $module = $app->getModule(CustomUrls::ID);
+        /** @var CustomUrlsModule $module */
+        $module = $app->getModule(CustomUrlsModule::ID);
         /** @var ModuleService $moduleService */
         $moduleService = Yii::$container->get(ModuleService::class);
         $moduleService->registerModule($module);

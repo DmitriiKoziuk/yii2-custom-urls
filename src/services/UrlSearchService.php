@@ -3,17 +3,17 @@ namespace DmitriiKoziuk\yii2CustomUrls\services;
 
 use yii\db\ActiveQuery;
 use yii\data\ActiveDataProvider;
-use DmitriiKoziuk\yii2CustomUrls\data\UrlIndexSearchParams;
+use DmitriiKoziuk\yii2CustomUrls\forms\UrlSearchForm;
 use DmitriiKoziuk\yii2CustomUrls\records\UrlIndexRecord;
 
-class UrlIndexSearchService
+class UrlSearchService
 {
     /**
-     * @var UrlIndexSearchParams $_searchParams
+     * @var UrlSearchForm $_searchParams
      */
     private $_searchParams;
 
-    public function __construct(UrlIndexSearchParams $searchParams)
+    public function __construct(UrlSearchForm $searchParams)
     {
         $this->_searchParams = $searchParams;
     }
