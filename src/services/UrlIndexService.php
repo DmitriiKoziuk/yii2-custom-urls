@@ -2,7 +2,7 @@
 namespace DmitriiKoziuk\yii2CustomUrls\services;
 
 use yii\db\Connection;
-use DmitriiKoziuk\yii2Base\services\EntityActionService;
+use DmitriiKoziuk\yii2Base\services\DBActionService;
 use DmitriiKoziuk\yii2Base\exceptions\EntityNotFoundException;
 use DmitriiKoziuk\yii2Base\exceptions\DataNotValidException;
 use DmitriiKoziuk\yii2Base\exceptions\EntityDeleteException;
@@ -19,7 +19,7 @@ use DmitriiKoziuk\yii2CustomUrls\repositories\UrlIndexRepository;
  * Class UrlService
  * @package DmitriiKoziuk\yii2CustomUrls\services
  */
-final class UrlIndexService extends EntityActionService
+final class UrlIndexService extends DBActionService
 {
     private $_urlIndexRepository;
 
