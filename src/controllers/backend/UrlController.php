@@ -18,7 +18,7 @@ use DmitriiKoziuk\yii2CustomUrls\services\UrlIndexService;
 /**
  * UrlController implements the CRUD actions for UrlIndex model.
  */
-class UrlController extends Controller
+final class UrlController extends Controller
 {
     protected $_urlIndexService;
 
