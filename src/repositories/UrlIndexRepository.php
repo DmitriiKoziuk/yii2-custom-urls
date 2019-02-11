@@ -2,10 +2,10 @@
 namespace DmitriiKoziuk\yii2CustomUrls\repositories;
 
 use yii\db\Expression;
-use DmitriiKoziuk\yii2Base\repositories\EntityRepository;
+use DmitriiKoziuk\yii2Base\repositories\AbstractActiveRecordRepository;
 use DmitriiKoziuk\yii2CustomUrls\records\UrlIndexRecord;
 
-class UrlIndexRepository extends EntityRepository
+class UrlIndexRepository extends AbstractActiveRecordRepository
 {
     /**
      * @param string $controllerName

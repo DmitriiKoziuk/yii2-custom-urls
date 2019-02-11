@@ -5,14 +5,17 @@ use yii\di\Container;
 use yii\base\Application;
 use DmitriiKoziuk\yii2ModuleManager\interfaces\ModuleInterface;
 use DmitriiKoziuk\yii2CustomUrls\components\UrlRule;
-use DmitriiKoziuk\yii2CustomUrls\services\UrlService;
+use DmitriiKoziuk\yii2CustomUrls\services\UrlIndexService;
 use DmitriiKoziuk\yii2CustomUrls\repositories\UrlIndexRepository;
 use DmitriiKoziuk\yii2CustomUrls\services\UrlFilterService;
 
-final class CustomUrls extends \yii\base\Module implements ModuleInterface
+final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
 {
     const ID = 'dk-custom-urls';
 
+    /**
+     * @var string
+     */
     const TRANSLATE = self::ID;
 
     /**
@@ -50,7 +53,7 @@ final class CustomUrls extends \yii\base\Module implements ModuleInterface
 
     public function getBackendMenuItems(): array
     {
-        return ['label' => 'Custom urls', 'url' => ['/' . self::ID . '/url-index/index']];
+        return ['label' => 'Custom urls', 'url' => ['/' . self::ID . '/url/index']];
     }
 
     private function _initLocalProperties(Application $app)
@@ -85,9 +88,9 @@ final class CustomUrls extends \yii\base\Module implements ModuleInterface
         $urlIndexRepository = $this->diContainer->get(UrlIndexRepository::class);
 
         $this->diContainer->set(
-            UrlService::class,
+            UrlIndexService::class,
             function () use ($urlIndexRepository, $app) {
-                return new UrlService($urlIndexRepository, $app->db);
+                return new UrlIndexService($urlIndexRepository, $app->db);
             }
         );
         $this->diContainer->setSingleton(UrlFilterService::class, function () {

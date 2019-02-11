@@ -5,7 +5,7 @@ use yii\widgets\ActiveForm;
 use DmitriiKoziuk\yii2Base\BaseModule as BaseModule;
 
 /* @var $this  yii\web\View */
-/* @var $model \DmitriiKoziuk\yii2CustomUrls\data\UrlIndexSearchParams */
+/* @var $model \DmitriiKoziuk\yii2CustomUrls\forms\UrlSearchForm */
 /* @var $form  yii\widgets\ActiveForm */
 ?>
 

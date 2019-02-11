@@ -1,9 +1,10 @@
 <?php
-namespace DmitriiKoziuk\yii2CustomUrls\data;
+namespace DmitriiKoziuk\yii2CustomUrls\forms;
 
-use yii\base\Model;
+use DmitriiKoziuk\yii2Base\forms\Form;
+use DmitriiKoziuk\yii2CustomUrls\data\UrlIndexAttributeLabels;
 
-class UrlIndexSearchParams extends Model
+class UrlSearchForm extends Form
 {
     public $url;
     public $redirect_to_url;

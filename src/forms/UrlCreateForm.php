@@ -1,9 +1,9 @@
 <?php
 namespace DmitriiKoziuk\yii2CustomUrls\forms;
 
-use yii\base\Model;
+use DmitriiKoziuk\yii2Base\forms\Form;
 
-class UrlCreateForm extends Model
+class UrlCreateForm extends Form
 {
     public $url;
     public $module_name;

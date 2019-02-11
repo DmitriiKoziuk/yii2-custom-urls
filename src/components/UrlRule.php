@@ -11,7 +11,7 @@ use yii\web\UrlRuleInterface;
 
 use DmitriiKoziuk\yii2Base\exceptions\StringDoesNotMatchException;
 
-use DmitriiKoziuk\yii2CustomUrls\CustomUrls;
+use DmitriiKoziuk\yii2CustomUrls\CustomUrlsModule;
 use DmitriiKoziuk\yii2CustomUrls\data\UrlData;
 use DmitriiKoziuk\yii2CustomUrls\repositories\UrlIndexRepository;
 use DmitriiKoziuk\yii2CustomUrls\services\UrlFilterService;
@@ -60,33 +60,26 @@ final class UrlRule extends BaseObject implements UrlRuleInterface
             AddingDuplicateParamValueException $e
         ) {
             throw new NotFoundHttpException(
-                Yii::t(CustomUrls::ID, 'Page not found.')
+                Yii::t(CustomUrlsModule::ID, 'Page not found.')
             );
         }
         if (! $this->_filterService->isParamsInTheAlphabeticalOrder()) {
             throw new NotFoundHttpException(
-                Yii::t(CustomUrls::ID, 'Page not found.')
+                Yii::t(CustomUrlsModule::ID, 'Page not found.')
             );
         }
         $url = $this->_cutOutFilterParamsFromUrl($url);
         $urlIndexRecord = $this->_urlIndexRepository->findByUrl($url);
-
         if (empty($urlIndexRecord)) {
             return false;
         }
-
-        $urlIndexData = new UrlData();
-        $urlIndexData->setAttributes($urlIndexRecord->getAttributes());
-
-        $entity = $urlIndexRecord->module_name ?
-            $urlIndexRecord->module_name . '/' :
-            '';
-        $entity .= $urlIndexRecord->controller_name . '/' . $urlIndexRecord->action_name;
-
+        $urlData = new UrlData($urlIndexRecord);
+        $route = ! empty($urlData->getModuleName()) ? $urlData->getModuleName() . '/' : '';
+        $route .= $urlData->getControllerName() . '/' . $urlData->getActionName();
         return [
-            $entity,
+            $route,
             [
-                'urlData' => $urlIndexData,
+                'urlData' => $urlData,
                 'filterService' => $this->_filterService,
             ]
         ];
