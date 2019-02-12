@@ -16,7 +16,7 @@ php composer.phar require dmitriikoziuk/yii2-custom-urls
 or add
 
 ```
-"dmitriikoziuk/yii2-custom-urls": "^0.1"
+"dmitriikoziuk/yii2-custom-urls": "~0.2.0"
 ```
 
 to the require section of your `composer.json` file.
