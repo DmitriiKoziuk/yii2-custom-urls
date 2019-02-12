@@ -3,7 +3,9 @@ namespace DmitriiKoziuk\yii2CustomUrls;
 
 use yii\di\Container;
 use yii\base\Application;
+use DmitriiKoziuk\yii2Base\BaseModule;
 use DmitriiKoziuk\yii2ModuleManager\interfaces\ModuleInterface;
+use DmitriiKoziuk\yii2ConfigManager\ConfigManagerModule;
 use DmitriiKoziuk\yii2CustomUrls\components\UrlRule;
 use DmitriiKoziuk\yii2CustomUrls\services\UrlIndexService;
 use DmitriiKoziuk\yii2CustomUrls\repositories\UrlIndexRepository;
@@ -46,14 +48,22 @@ final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
         $this->_registerRules($app);
     }
 
-    public function getId(): string
+    public static function getId(): string
     {
-        return $this::ID;
+        return self::ID;
     }
 
     public function getBackendMenuItems(): array
     {
         return ['label' => 'Custom urls', 'url' => ['/' . self::ID . '/url/index']];
+    }
+
+    public static function requireOtherModulesToBeActive(): array
+    {
+        return [
+            BaseModule::class,
+            ConfigManagerModule::class,
+        ];
     }
 
     private function _initLocalProperties(Application $app)
