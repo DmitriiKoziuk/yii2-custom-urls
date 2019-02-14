@@ -24,6 +24,6 @@ The preferred way to install this extension is through [composer](http://getcomp
     
     to the require section of your `composer.json` file.
 
-2. Run command `/path/to/php-bin/php /path/to/yii-application/yii migrate --migrationPath=@DmitriiKoziuk/yii2CustomUrls/migrations`.
+2. Run command `/path/to/php-bin/php /path/to/yii-application/yii migrate`.
 
 3. Uncomment `urlManager` in `/path/to/yii-application/frontend/config/main.php`
