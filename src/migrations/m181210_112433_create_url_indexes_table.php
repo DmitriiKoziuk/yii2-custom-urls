@@ -1,4 +1,5 @@
 <?php
+namespace DmitriiKoziuk\yii2CustomUrls\migrations;
 
 use yii\db\Migration;
 
