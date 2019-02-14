@@ -2,7 +2,9 @@
 namespace DmitriiKoziuk\yii2CustomUrls;
 
 use yii\di\Container;
-use yii\base\Application;
+use yii\web\Application as WebApp;
+use yii\base\Application as BaseApp;
+use yii\console\Application as ConsoleApp;
 use DmitriiKoziuk\yii2Base\BaseModule;
 use DmitriiKoziuk\yii2ModuleManager\interfaces\ModuleInterface;
 use DmitriiKoziuk\yii2ConfigManager\ConfigManagerModule;
@@ -40,7 +42,7 @@ final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
     public function init()
     {
         parent::init();
-        /** @var Application $app */
+        /** @var BaseApp $app */
         $app = $this->module;
         $this->_initLocalProperties($app);
         $this->_registerTranslations($app);
@@ -66,7 +68,7 @@ final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
         ];
     }
 
-    private function _initLocalProperties(Application $app)
+    private function _initLocalProperties(BaseApp $app)
     {
         if (empty($this->backendAppId)) {
             throw new \InvalidArgumentException('Property backendAppId not set.');
@@ -74,12 +76,15 @@ final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
         if (empty($this->frontendAppId)) {
             throw new \InvalidArgumentException('Property frontendAppId not set.');
         }
-        if ($app instanceof \yii\web\Application && $app->id == $this->backendAppId) {
+        if ($app instanceof WebApp && $app->id == $this->backendAppId) {
             $this->controllerNamespace = __NAMESPACE__ . '\controllers\backend';
+        }
+        if ($app instanceof ConsoleApp) {
+            $app->controllerMap['migrate']['migrationNamespaces'][] = __NAMESPACE__ . '\migrations';
         }
     }
 
-    private function _registerTranslations(Application $app): void
+    private function _registerTranslations(BaseApp $app): void
     {
         $app->i18n->translations[self::TRANSLATE] = [
             'class'          => 'yii\i18n\PhpMessageSource',
@@ -88,7 +93,7 @@ final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
         ];
     }
 
-    private function _registerClassesToDIContainer(Application $app): void
+    private function _registerClassesToDIContainer(BaseApp $app): void
     {
         $this->diContainer->setSingleton(UrlIndexRepository::class, function () {
             return new UrlIndexRepository();
@@ -118,9 +123,9 @@ final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
         );
     }
 
-    private function _registerRules(Application $app): void
+    private function _registerRules(BaseApp $app): void
     {
-        if ($app instanceof \yii\web\Application && $app->id == $this->frontendAppId) {
+        if ($app instanceof WebApp && $app->id == $this->frontendAppId) {
             $app->getUrlManager()->addRules([
                 [
                     'class' => __NAMESPACE__ . '\components\UrlRule',
