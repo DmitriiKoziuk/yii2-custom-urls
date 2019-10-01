@@ -1,16 +1,23 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DmitriiKoziuk\yii2CustomUrls;
 
 use yii\di\Container;
 use yii\web\Application as WebApp;
 use yii\base\Application as BaseApp;
 use yii\console\Application as ConsoleApp;
+
 use DmitriiKoziuk\yii2Base\BaseModule;
+
 use DmitriiKoziuk\yii2ModuleManager\interfaces\ModuleInterface;
+
 use DmitriiKoziuk\yii2ConfigManager\ConfigManagerModule;
+
+use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
+use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlIndexServiceInterface;
+use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
+
 use DmitriiKoziuk\yii2CustomUrls\components\UrlRule;
-use DmitriiKoziuk\yii2CustomUrls\services\UrlIndexService;
-use DmitriiKoziuk\yii2CustomUrls\repositories\UrlIndexRepository;
 use DmitriiKoziuk\yii2CustomUrls\services\UrlFilterService;
 
 final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
@@ -44,10 +51,10 @@ final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
         parent::init();
         /** @var BaseApp $app */
         $app = $this->module;
-        $this->_initLocalProperties($app);
-        $this->_registerTranslations($app);
-        $this->_registerClassesToDIContainer($app);
-        $this->_registerRules($app);
+        $this->initLocalProperties($app);
+        $this->registerTranslations($app);
+        $this->registerClassesToDIContainer($app);
+        $this->registerRules($app);
     }
 
     public static function getId(): string
@@ -65,10 +72,11 @@ final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
         return [
             BaseModule::class,
             ConfigManagerModule::class,
+            UrlIndexModule::class,
         ];
     }
 
-    private function _initLocalProperties(BaseApp $app)
+    private function initLocalProperties(BaseApp $app)
     {
         if (empty($this->backendAppId)) {
             throw new \InvalidArgumentException('Property backendAppId not set.');
@@ -76,15 +84,12 @@ final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
         if (empty($this->frontendAppId)) {
             throw new \InvalidArgumentException('Property frontendAppId not set.');
         }
-        if ($app instanceof WebApp && $app->id == $this->backendAppId) {
-            $this->controllerNamespace = __NAMESPACE__ . '\controllers\backend';
-        }
         if ($app instanceof ConsoleApp) {
             $app->controllerMap['migrate']['migrationNamespaces'][] = __NAMESPACE__ . '\migrations';
         }
     }
 
-    private function _registerTranslations(BaseApp $app): void
+    private function registerTranslations(BaseApp $app): void
     {
         $app->i18n->translations[self::TRANSLATE] = [
             'class'          => 'yii\i18n\PhpMessageSource',
@@ -93,37 +98,26 @@ final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
         ];
     }
 
-    private function _registerClassesToDIContainer(BaseApp $app): void
+    private function registerClassesToDIContainer(BaseApp $app): void
     {
-        $this->diContainer->setSingleton(UrlIndexRepository::class, function () {
-            return new UrlIndexRepository();
-        });
-
-        /** @var UrlIndexRepository $urlIndexRepository */
-        $urlIndexRepository = $this->diContainer->get(UrlIndexRepository::class);
-
-        $this->diContainer->set(
-            UrlIndexService::class,
-            function () use ($urlIndexRepository, $app) {
-                return new UrlIndexService($urlIndexRepository, $app->db);
-            }
-        );
         $this->diContainer->setSingleton(UrlFilterService::class, function () {
             return new UrlFilterService();
         });
 
         /** @var UrlFilterService $urlFilterService */
         $urlFilterService = $this->diContainer->get(UrlFilterService::class);
+        /** @var UrlIndexServiceInterface $urlIndexService */
+        $urlIndexService = $this->diContainer->get(UrlIndexService::class);
 
         $this->diContainer->set(
             UrlRule::class,
-            function () use ($urlIndexRepository, $urlFilterService) {
-                return new UrlRule($urlIndexRepository, $urlFilterService);
+            function () use ($urlIndexService, $urlFilterService) {
+                return new UrlRule($urlIndexService, $urlFilterService);
             }
         );
     }
 
-    private function _registerRules(BaseApp $app): void
+    private function registerRules(BaseApp $app): void
     {
         if ($app instanceof WebApp && $app->id == $this->frontendAppId) {
             $app->getUrlManager()->addRules([

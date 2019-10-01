@@ -1,6 +1,8 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DmitriiKoziuk\yii2CustomUrls\components;
 
+use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
 use Yii;
 use yii\base\BaseObject;
 use yii\base\InvalidArgumentException;
@@ -12,8 +14,6 @@ use yii\web\UrlRuleInterface;
 use DmitriiKoziuk\yii2Base\exceptions\StringDoesNotMatchException;
 
 use DmitriiKoziuk\yii2CustomUrls\CustomUrlsModule;
-use DmitriiKoziuk\yii2CustomUrls\data\UrlData;
-use DmitriiKoziuk\yii2CustomUrls\repositories\UrlIndexRepository;
 use DmitriiKoziuk\yii2CustomUrls\services\UrlFilterService;
 use DmitriiKoziuk\yii2CustomUrls\exceptions\AddingDuplicateParamException;
 use DmitriiKoziuk\yii2CustomUrls\exceptions\AddingDuplicateParamValueException;
@@ -21,9 +21,9 @@ use DmitriiKoziuk\yii2CustomUrls\exceptions\AddingDuplicateParamValueException;
 final class UrlRule extends BaseObject implements UrlRuleInterface
 {
     /**
-     * @var UrlIndexRepository
+     * @var UrlIndexService
      */
-    private $_urlIndexRepository;
+    private $urlIndexService;
 
     /**
      * @var UrlFilterService
@@ -31,12 +31,12 @@ final class UrlRule extends BaseObject implements UrlRuleInterface
     private $_filterService;
 
     public function __construct(
-        UrlIndexRepository $urlIndexRepository,
+        UrlIndexService $urlIndexService,
         UrlFilterService $filterService,
         array $config = []
     ) {
         parent::__construct($config);
-        $this->_urlIndexRepository = $urlIndexRepository;
+        $this->urlIndexService = $urlIndexService;
         $this->_filterService = $filterService;
     }
 
@@ -51,7 +51,7 @@ final class UrlRule extends BaseObject implements UrlRuleInterface
     public function parseRequest($manager, $request)
     {
         $url = $request->getUrl();
-        $url = $this->_cutOutGetParamsFromUrl($url);
+        $url = $this->cutOutGetParamsFromUrl($url);
         try {
             $this->_filterService->parseUrl($url);
         } catch (
@@ -68,14 +68,13 @@ final class UrlRule extends BaseObject implements UrlRuleInterface
                 Yii::t(CustomUrlsModule::ID, 'Page not found.')
             );
         }
-        $url = $this->_cutOutFilterParamsFromUrl($url);
-        $urlIndexRecord = $this->_urlIndexRepository->findByUrl($url);
-        if (empty($urlIndexRecord)) {
+        $url = $this->cutOutFilterParamsFromUrl($url);
+        $urlData = $this->urlIndexService->getUrlByUrl($url);
+        if (empty($urlData)) {
             return false;
         }
-        $urlData = new UrlData($urlIndexRecord);
-        $route = ! empty($urlData->getModuleName()) ? $urlData->getModuleName() . '/' : '';
-        $route .= $urlData->getControllerName() . '/' . $urlData->getActionName();
+        $route = ! empty($urlData->module_name) ? $urlData->module_name . '/' : '';
+        $route .= $urlData->controller_name . '/' . $urlData->action_name;
         return [
             $route,
             [
@@ -114,7 +113,7 @@ final class UrlRule extends BaseObject implements UrlRuleInterface
      * @param string $url
      * @return string
      */
-    private function _cutOutGetParamsFromUrl(string $url): string
+    private function cutOutGetParamsFromUrl(string $url): string
     {
         $isGetParams = mb_strpos($url, '?');
         if (false !== $isGetParams) {
@@ -128,7 +127,7 @@ final class UrlRule extends BaseObject implements UrlRuleInterface
      * @param string $url
      * @return string
      */
-    private function _cutOutFilterParamsFromUrl(string $url): string
+    private function cutOutFilterParamsFromUrl(string $url): string
     {
         $isFilter = mb_strpos($url, $this->_filterService->getFilterMark());
         if (false !== $isFilter) {
