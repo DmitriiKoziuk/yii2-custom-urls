@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace DmitriiKoziuk\yii2CustomUrls\services;
 
 use DmitriiKoziuk\yii2Base\exceptions\StringDoesNotMatchException;
-
 use DmitriiKoziuk\yii2CustomUrls\helpers\ArrayHelper;
 use DmitriiKoziuk\yii2CustomUrls\exceptions\AddingDuplicateParamException;
 use DmitriiKoziuk\yii2CustomUrls\exceptions\AddingDuplicateParamValueException;
