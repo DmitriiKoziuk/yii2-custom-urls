@@ -2,7 +2,6 @@
 
 namespace DmitriiKoziuk\yii2CustomUrls\components;
 
-use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
 use Yii;
 use yii\base\BaseObject;
 use yii\base\InvalidArgumentException;
@@ -10,9 +9,8 @@ use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\UrlManager;
 use yii\web\UrlRuleInterface;
-
 use DmitriiKoziuk\yii2Base\exceptions\StringDoesNotMatchException;
-
+use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
 use DmitriiKoziuk\yii2CustomUrls\CustomUrlsModule;
 use DmitriiKoziuk\yii2CustomUrls\services\UrlFilterService;
 use DmitriiKoziuk\yii2CustomUrls\exceptions\AddingDuplicateParamException;
@@ -28,7 +26,7 @@ final class UrlRule extends BaseObject implements UrlRuleInterface
     /**
      * @var UrlFilterService
      */
-    private $_filterService;
+    private $filterService;
 
     public function __construct(
         UrlIndexService $urlIndexService,
@@ -37,7 +35,7 @@ final class UrlRule extends BaseObject implements UrlRuleInterface
     ) {
         parent::__construct($config);
         $this->urlIndexService = $urlIndexService;
-        $this->_filterService = $filterService;
+        $this->filterService = $filterService;
     }
 
     /**
@@ -53,7 +51,7 @@ final class UrlRule extends BaseObject implements UrlRuleInterface
         $url = $request->getUrl();
         $url = $this->cutOutGetParamsFromUrl($url);
         try {
-            $this->_filterService->parseUrl($url);
+            $this->filterService->parseUrl($url);
         } catch (
             StringDoesNotMatchException |
             AddingDuplicateParamException |
@@ -63,7 +61,7 @@ final class UrlRule extends BaseObject implements UrlRuleInterface
                 Yii::t(CustomUrlsModule::ID, 'Page not found.')
             );
         }
-        if (! $this->_filterService->isParamsInTheAlphabeticalOrder()) {
+        if (! $this->filterService->isParamsInTheAlphabeticalOrder()) {
             throw new NotFoundHttpException(
                 Yii::t(CustomUrlsModule::ID, 'Page not found.')
             );
@@ -79,7 +77,7 @@ final class UrlRule extends BaseObject implements UrlRuleInterface
             $route,
             [
                 'urlData' => $urlData,
-                'filterService' => $this->_filterService,
+                'filterService' => $this->filterService,
             ]
         ];
     }
@@ -129,7 +127,7 @@ final class UrlRule extends BaseObject implements UrlRuleInterface
      */
     private function cutOutFilterParamsFromUrl(string $url): string
     {
-        $isFilter = mb_strpos($url, $this->_filterService->getFilterMark());
+        $isFilter = mb_strpos($url, $this->filterService->getFilterMark());
         if (false !== $isFilter) {
             $url = mb_substr($url, 0, $isFilter);
         }

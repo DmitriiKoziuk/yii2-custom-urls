@@ -5,18 +5,10 @@ namespace DmitriiKoziuk\yii2CustomUrls;
 use yii\di\Container;
 use yii\web\Application as WebApp;
 use yii\base\Application as BaseApp;
-use yii\console\Application as ConsoleApp;
-
-use DmitriiKoziuk\yii2Base\BaseModule;
-
 use DmitriiKoziuk\yii2ModuleManager\interfaces\ModuleInterface;
-
 use DmitriiKoziuk\yii2ConfigManager\ConfigManagerModule;
-
 use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
-use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlIndexServiceInterface;
 use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
-
 use DmitriiKoziuk\yii2CustomUrls\components\UrlRule;
 use DmitriiKoziuk\yii2CustomUrls\services\UrlFilterService;
 
@@ -64,13 +56,12 @@ final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
 
     public function getBackendMenuItems(): array
     {
-        return ['label' => 'Custom urls', 'url' => ['/' . self::ID . '/url/index']];
+        return [];
     }
 
     public static function requireOtherModulesToBeActive(): array
     {
         return [
-            BaseModule::class,
             ConfigManagerModule::class,
             UrlIndexModule::class,
         ];
@@ -83,9 +74,6 @@ final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
         }
         if (empty($this->frontendAppId)) {
             throw new \InvalidArgumentException('Property frontendAppId not set.');
-        }
-        if ($app instanceof ConsoleApp) {
-            $app->controllerMap['migrate']['migrationNamespaces'][] = __NAMESPACE__ . '\migrations';
         }
     }
 
@@ -106,7 +94,7 @@ final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
 
         /** @var UrlFilterService $urlFilterService */
         $urlFilterService = $this->diContainer->get(UrlFilterService::class);
-        /** @var UrlIndexServiceInterface $urlIndexService */
+        /** @var UrlIndexService $urlIndexService */
         $urlIndexService = $this->diContainer->get(UrlIndexService::class);
 
         $this->diContainer->set(

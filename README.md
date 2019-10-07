@@ -15,15 +15,5 @@ The preferred way to install this extension is through [composer](http://getcomp
     ```
     php composer.phar require dmitriikoziuk/yii2-custom-urls
     ```
-    
-    or add
-    
-    ```
-    "dmitriikoziuk/yii2-custom-urls": "~0.2.0"
-    ```
-    
-    to the require section of your `composer.json` file.
 
-2. Run command `/path/to/php-bin/php /path/to/yii-application/yii migrate`.
-
-3. Uncomment `urlManager` in `/path/to/yii-application/frontend/config/main.php`
+2. Uncomment `urlManager` in `/path/to/yii-application/frontend/config/main.php`
