@@ -56,7 +56,7 @@ final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
 
     public function getBackendMenuItems(): array
     {
-        return ['label' => 'Custom urls', 'url' => ['/' . self::ID . '/url/index']];
+        return [];
     }
 
     public static function requireOtherModulesToBeActive(): array
