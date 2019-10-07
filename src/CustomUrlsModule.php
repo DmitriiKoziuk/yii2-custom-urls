@@ -5,18 +5,10 @@ namespace DmitriiKoziuk\yii2CustomUrls;
 use yii\di\Container;
 use yii\web\Application as WebApp;
 use yii\base\Application as BaseApp;
-use yii\console\Application as ConsoleApp;
-
-use DmitriiKoziuk\yii2Base\BaseModule;
-
 use DmitriiKoziuk\yii2ModuleManager\interfaces\ModuleInterface;
-
 use DmitriiKoziuk\yii2ConfigManager\ConfigManagerModule;
-
 use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
-use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlIndexServiceInterface;
 use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
-
 use DmitriiKoziuk\yii2CustomUrls\components\UrlRule;
 use DmitriiKoziuk\yii2CustomUrls\services\UrlFilterService;
 
@@ -70,7 +62,6 @@ final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
     public static function requireOtherModulesToBeActive(): array
     {
         return [
-            BaseModule::class,
             ConfigManagerModule::class,
             UrlIndexModule::class,
         ];
