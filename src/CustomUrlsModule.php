@@ -84,9 +84,6 @@ final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
         if (empty($this->frontendAppId)) {
             throw new \InvalidArgumentException('Property frontendAppId not set.');
         }
-        if ($app instanceof ConsoleApp) {
-            $app->controllerMap['migrate']['migrationNamespaces'][] = __NAMESPACE__ . '\migrations';
-        }
     }
 
     private function registerTranslations(BaseApp $app): void
@@ -106,7 +103,7 @@ final class CustomUrlsModule extends \yii\base\Module implements ModuleInterface
 
         /** @var UrlFilterService $urlFilterService */
         $urlFilterService = $this->diContainer->get(UrlFilterService::class);
-        /** @var UrlIndexServiceInterface $urlIndexService */
+        /** @var UrlIndexService $urlIndexService */
         $urlIndexService = $this->diContainer->get(UrlIndexService::class);
 
         $this->diContainer->set(
