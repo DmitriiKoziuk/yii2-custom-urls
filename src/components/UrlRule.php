@@ -2,7 +2,6 @@
 
 namespace DmitriiKoziuk\yii2CustomUrls\components;
 
-use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
 use Yii;
 use yii\base\BaseObject;
 use yii\base\InvalidArgumentException;
@@ -10,9 +9,8 @@ use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\web\UrlManager;
 use yii\web\UrlRuleInterface;
-
 use DmitriiKoziuk\yii2Base\exceptions\StringDoesNotMatchException;
-
+use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
 use DmitriiKoziuk\yii2CustomUrls\CustomUrlsModule;
 use DmitriiKoziuk\yii2CustomUrls\services\UrlFilterService;
 use DmitriiKoziuk\yii2CustomUrls\exceptions\AddingDuplicateParamException;
