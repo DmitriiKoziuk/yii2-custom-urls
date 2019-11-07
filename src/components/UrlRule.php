@@ -67,18 +67,18 @@ final class UrlRule extends BaseObject implements UrlRuleInterface
             );
         }
         $url = $this->cutOutFilterParamsFromUrl($url);
-        $urlData = $this->urlIndexService->getUrlByUrl($url);
-        if (empty($urlData)) {
+        $url = $this->urlIndexService->getUrlByUrl($url);
+        if (empty($url)) {
             return false;
         }
-        $route = ! empty($urlData->module_name) ? $urlData->module_name . '/' : '';
-        $route .= $urlData->controller_name . '/' . $urlData->action_name;
+        $route = ! empty($url->module_name) ? $url->module_name . '/' : '';
+        $route .= $url->controller_name . '/' . $url->action_name;
         return [
             $route,
             [
-                'urlData' => $urlData,
-                'filterParams' => $this->filterService->getParsedParams(),
+                'url' => $url,
                 'getParams' => $request->getQueryParams(),
+                'filterParams' => $this->filterService->getParsedParams(),
             ]
         ];
     }
