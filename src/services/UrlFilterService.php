@@ -51,16 +51,16 @@ final class UrlFilterService
     /**
      * @param string  $name      Param name
      * @param string  $value     Param value
-     * @param boolean $overwrite default false. Throw exception if you adding duplicate param value.
+     * @param boolean $overwriteExistParamValue default false. Throw exception if you adding duplicate param value.
      * @return $this
      * @throws AddingDuplicateParamValueException
      * @throws StringDoesNotMatchException
      */
-    public function addParam(string $name, string $value, bool $overwrite = false): self
+    public function addParam(string $name, string $value, bool $overwriteExistParamValue = false): self
     {
         $this->_checkParamNameForConsistency($name);
         $this->_checkParamValueForConsistency($value);
-        if (empty($this->_userAddedParams[ $name ][ $value ]) || $overwrite) {
+        if (empty($this->_userAddedParams[ $name ][ $value ]) || $overwriteExistParamValue) {
             $this->_userAddedParams[ $name ][ $value ] = $value;
         } else {
             throw new AddingDuplicateParamValueException(
@@ -79,20 +79,20 @@ final class UrlFilterService
      *         'v2',
      * ]
      * @param array   $params
-     * @param boolean $overwrite
+     * @param boolean $overwriteExistParamValues
      * @return $this
      * @throws AddingDuplicateParamValueException
      * @throws StringDoesNotMatchException
      */
-    public function addParams(array $params, bool $overwrite = false): self
+    public function addParams(array $params, bool $overwriteExistParamValues = false): self
     {
         foreach ($params as $paramName => $paramValues) {
             if (is_array($paramValues)) {
                 foreach ($paramValues as $paramValue) {
-                    $this->addParam($paramName, $paramValue, $overwrite);
+                    $this->addParam($paramName, $paramValue, $overwriteExistParamValues);
                 }
             } else {
-                $this->addParam($paramName, $paramValues, $overwrite);
+                $this->addParam($paramName, $paramValues, $overwriteExistParamValues);
             }
         }
         return $this;
