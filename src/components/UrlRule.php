@@ -89,8 +89,6 @@ final class UrlRule extends BaseObject implements UrlRuleInterface
      * @param string $route the route. It should not have slashes at the beginning or the end.
      * @param array $params the parameters
      * @return string|bool the created URL, or false if this rule cannot be used for creating this URL.
-     * @throws AddingDuplicateParamValueException
-     * @throws StringDoesNotMatchException
      */
     public function createUrl($manager, $route, $params)
     {
@@ -100,8 +98,7 @@ final class UrlRule extends BaseObject implements UrlRuleInterface
             }
             $url = $params['url'];
             if (! empty($params['filterParams'])) {
-                $this->filterService->addParams($params['filterParams'], true);
-                $url .= $this->filterService->getFilterString();
+                $url .= $this->filterService->createUrl($params['filterParams']);
             }
             if (! empty($params['getParams'])) {
                 $url .= '?' . http_build_query($params['getParams']);

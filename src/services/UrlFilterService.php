@@ -22,6 +22,14 @@ final class UrlFilterService
         return $this->_filterMark;
     }
 
+    public function createUrl(array $filterParams)
+    {
+        $this->addParams($filterParams, true);
+        $returnString = $this->getFilterString();
+        $this->_userAddedParams = [];
+        return $returnString;
+    }
+
     /**
      * @param string $name
      * @return array|null
@@ -300,7 +308,7 @@ final class UrlFilterService
      */
     private function _checkParamValueForConsistency(string $string): void
     {
-        if (! preg_match('/^[\w-]+$/', $string)) {
+        if (! preg_match('/^[\w\-.]+$/', $string)) {
             throw new StringDoesNotMatchException('Param name does not comply with the rules.');
         }
     }
